@@ -42,12 +42,14 @@ package NTP is
    end record with
      Pack => True,
      Size => 64;
+
    type NTP_Short is  record
       Seconds  :  Interfaces.Unsigned_16;
       Fraction :  Interfaces.Unsigned_16;
    end record with
-Pack => True,
-Size => 32;
+     Pack => True,
+     Size => 32;
+
    type Ntp_Packet is record
       LI              : Leap_Indicator;
       VN              : Version_Number;
@@ -85,6 +87,7 @@ Size => 32;
                     To     : in GNAT.Sockets.Sock_Addr_Type);
    procedure Serve (Self : in out NTP_Server);
    --  To be used in busy loop;
+
 private
    type NTP_Server is tagged record
       Socket : GNAT.Sockets.Socket_Type;
