@@ -6,7 +6,7 @@ project Ntp is
    for Main use ("ntp-main.adb");
 
    package Compiler is
-      for Switches ("ada") use ("-gnatX0", "-gnatwa", "-gnatyaAbBcdfhiklnOprtux");
+      for Switches ("ada") use ( "-gnatwa", "-gnatyaAbBcdfhiklnOprtux", "-gnatX");
    end Compiler;
 
 end Ntp;
