@@ -1,5 +1,6 @@
+with NTP.Servers;
 procedure NTP.Main is
-   S : NTP_Server;
+   S : Servers.NTP_Server;
 begin
    S.Initialize;
    loop

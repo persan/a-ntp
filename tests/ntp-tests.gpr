@@ -1,5 +1,5 @@
-
-project Ntp.tests extends "../ntp.gpr" is
+with "../ntp.gpr";
+project NTP.Tests  is
 
    for Source_Dirs use ("src");
    for Object_Dir use ".obj";
@@ -7,5 +7,5 @@ project Ntp.tests extends "../ntp.gpr" is
    for Main use ("ntp-main.adb");
    package Compiler renames Ntp.Compiler;
 
-end Ntp.tests;
+end NTP.Tests;
 

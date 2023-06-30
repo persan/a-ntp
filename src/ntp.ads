@@ -2,10 +2,18 @@
 --  https://www.rfc-editor.org/rfc/rfc5905.txt
 
 with Interfaces;
-with GNAT.Sockets; use GNAT.Sockets;
-with Ada.Streams;
 
 package NTP is
+
+   PORT      : constant := 123;   --  NTP port number
+   VERSION   : constant := 4;     --  NTP version number
+   TOLERANCE : constant := 15.0e-6; --  frequency tolerance PHI (s/s)
+   MINPOLL   : constant := 4;     --  minimum poll exponent (16 s)
+   MAXPOLL   : constant := 17;    --  maximum poll exponent (36 h)
+   MAXDISP   : constant := 16;    --  maximum dispersion (16 s)
+   MINDISP   : constant := 0.005; --  minimum dispersion increment (s)
+   MAXDIST   : constant := 1;     --  distance threshold (1 s)
+   MAXSTRAT  : constant := 16;    --  maximum stratum numbe
 
    type Leap_Indicator is (No_Warning,
                            Last_Minute_Of_The_Day_Has_61_Seconds,
@@ -36,19 +44,8 @@ package NTP is
    type Poll_Type is range -128 .. 127 with Default_Value => 0;
    type Precision_Type is range -128 .. 127 with Default_Value => 0;
 
-   type NTP_Timestamp is record
-      Seconds  :  Interfaces.Unsigned_32;
-      Fraction :  Interfaces.Unsigned_32;
-   end record with
-     Pack => True,
-     Size => 64;
-
-   type NTP_Short is  record
-      Seconds  :  Interfaces.Unsigned_16;
-      Fraction :  Interfaces.Unsigned_16;
-   end record with
-     Pack => True,
-     Size => 32;
+   type NTP_Timestamp is private;
+   type NTP_Short is private;
 
    type Ntp_Packet is record
       LI              : Leap_Indicator;
@@ -66,31 +63,38 @@ package NTP is
       Orig_Tm       : NTP_Timestamp;
       Rx_Tm         : NTP_Timestamp;
       Tx_Tm         : NTP_Timestamp;
-   end record with
-     Pack => True,
-     Size => 384;
+   end record;
 
-   type NTP_Server is tagged private;
 
-   procedure Initialize (Self : in out NTP_Server;
-                         Port : GNAT.Sockets.Port_Type := GNAT.Sockets.Port_Number
-                           (Get_Service_By_Name ("ntp", "udp")));
-
-   procedure Finalize (Self : in out NTP_Server);
-
-   procedure On_Call (Self   : in out NTP_Server;
-                      Data   : Ada.Streams.Stream_Element_Array;
-                      From   : in GNAT.Sockets.Sock_Addr_Type);
-   --  called from serve on on receptio of a valid data package.
-   procedure Reply (Self   : in out NTP_Server;
-                    Data   : Ada.Streams.Stream_Element_Array;
-                    To     : in GNAT.Sockets.Sock_Addr_Type);
-   procedure Serve (Self : in out NTP_Server);
-   --  To be used in busy loop;
 
 private
-   type NTP_Server is tagged record
-      Socket : GNAT.Sockets.Socket_Type;
+   type NTP_Timestamp is record
+      Seconds  :  Interfaces.Unsigned_32;
+      Fraction :  Interfaces.Unsigned_32;
+   end record with
+     Pack => True,
+     Size => 64;
+
+   type NTP_Short is  record
+      Seconds  :  Interfaces.Unsigned_16;
+      Fraction :  Interfaces.Unsigned_16;
+   end record with
+     Pack => True,
+     Size => 32;
+   for Ntp_Packet use record
+      LI              at  0 range  0 ..  1;
+      VN              at  0 range  2 ..  4;
+      Mode            at  0 range  5 ..  7;
+      Stratum         at  1 range  0 ..  7;
+      Poll            at  2 range  0 ..  7;
+      Precision       at  3 range  0 ..  7;
+      Root_Delay      at  4 range  0 .. 31;
+      Root_Dispersion at  8 range  0 .. 31;
+      Ref_Id          at 12 range  0 .. 31;
+      Ref_Tm          at 16 range  0 .. 63;
+      Orig_Tm         at 24 range  0 .. 63;
+      Rx_Tm           at 32 range  0 .. 63;
+      Tx_Tm           at 40 range  0 .. 63;
    end record;
 
 end NTP;

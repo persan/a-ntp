@@ -1,6 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Streams; use Ada.Streams;
-package body NTP is
+package body NTP.Servers is
 
    ----------------
    -- Initialize --
@@ -91,4 +91,4 @@ package body NTP is
       NTP_Server'Class (Self).On_Call (Item (Item'First .. Last), From);
    end Serve;
 
-end NTP;
+end NTP.Servers;
